@@ -25,8 +25,10 @@ if [ "${1:0:1}" = '-' ] || [ -z "${1##*:*}" ]; then
         exec gunicorn $GUNICORN_ARGS "$@"
     fi
 
-    # run build_assets
+    echo "Preparing Janeway assets..."
     python /janeway/src/manage.py build_assets
+    python /janeway/src/manage.py install_plugins ksulcolors
+    python /janeway/src/manage.py collectstatic --noinput
     exec gunicorn "$@"
 fi
 

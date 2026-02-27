@@ -1,0 +1,24 @@
+/* Insert CSS Below */
+:root {
+    --primary-dark-color: #22175b; /* Primary colour used by elements such as buttons */
+    --very-dark-primary-color: #22175b;  /* Darker primary colour used for contrast or hover effects */
+    --primary-light-color: #fff; /* lighter colour or secondary colour */
+    --topbar-background-color: #24193d; /* background colour for the top bar of the navigation */
+    --menu-foreground-color: #512888; /* font colour used in the menu bar */
+    }
+    
+    .top-bar .dropdown.menu > li.is-dropdown-submenu-parent > a::after {
+      border-color: #FFF transparent transparent;
+    }
+    
+    header #main-menu li a {
+      font-weight: 600;
+    }
+    
+    footer .large-2.logo-wrapper {
+      display: none;
+    }
+    
+    footer .large-text-right li a {
+      margin: 0;
+    }
