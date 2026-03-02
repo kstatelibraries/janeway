@@ -1,6 +1,7 @@
 db
 logs/*
 *.tar.gz
+.venv
 src/files/articles
 src/files/journals
 src/files/issues

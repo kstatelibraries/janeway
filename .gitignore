@@ -81,6 +81,7 @@ src/core/settings.py
 mydatabase
 node_modules/
 src/plugins/*
+!src/plugins/ksulcolors/
 src/media/profile_images/*
 
 # PyCharm
