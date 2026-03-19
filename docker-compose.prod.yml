@@ -1,0 +1,56 @@
+---
+services:
+  caddy:
+    restart: unless-stopped
+    image: caddy:2
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static-tallgrass:/srv/janeway-tallgrass/static:ro
+      - ./tallgrass/data/janeway/media:/srv/janeway-tallgrass/media
+      - ./tallgrass/data/janeway/files:/srv/janeway-tallgrass/files
+    depends_on:
+      - janeway-tallgrass-web
+
+  janeway-tallgrass-web:
+    image: kstatelibraries/janeway:test
+    build:
+      context: ../janeway
+      dockerfile: ../janeway/dockerfiles/Dockerfile.ksul
+    restart: unless-stopped
+    volumes:
+      - ./tallgrass/data/logs:/logs
+      - ./tallgrass/settings.py:/janeway/src/core/settings.py
+      - ./tallgrass/data/janeway/media:/janeway/src/media
+      - ./tallgrass/data/janeway/files:/janeway/src/files
+      - static-tallgrass:/janeway/src/collected-static
+    environment:
+      - DB_VENDOR=postgres
+      - DB_HOST=janeway-tallgrass-postgres
+      - DB_PORT=5432
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=janeway-web
+      - DB_NAME=janeway-tallgrass
+      - PYTHONDONTWRITEBYTECODE=yes
+      - NOSE_INCLUDE_EXE=1
+      - JANEWAY_EMAIL_BACKEND
+      - JANEWAY_EMAIL_HOST
+      - JANEWAY_EMAIL_PORT
+      - JANEWAY_EMAIL_USE_TLS
+      - APP_BUILT=1 # If janeway has already been installed this should be true, otherwise it should be left unset or set to 0
+    cap_add:
+      - SYS_PTRACE
+
+  janeway-tallgrass-postgres:
+    restart: unless-stopped
+    image: postgres:15
+    volumes:
+      - ./tallgrass/data/postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - "POSTGRES_USER=janeway-web"
+      - "POSTGRES_DB=janeway-tallgrass"
+
+volumes:
+  static-tallgrass:

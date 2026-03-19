@@ -1,13 +1,55 @@
 #!/bin/bash
 set -e
 
+install_plugins() {
+    local plugin
+    for plugin in ${JANEWAY_PLUGINS:-ksulcolors customstyling}; do
+        python /janeway/src/manage.py install_plugins "$plugin"
+    done
+}
+
+ensure_customstyling() {
+    local plugin_dir="/janeway/src/plugins/customstyling"
+
+    if [ -d "$plugin_dir" ]; then
+        return
+    fi
+
+    git clone "${CUSTOMSTYLING_REPO:-https://github.com/openlibhums/customstyling.git}" \
+        --branch "${CUSTOMSTYLING_REF:-v1.1.1}" \
+        "$plugin_dir"
+}
+
+# Check if APP_BUILT is set to a truthy value (e.g., 1, true, yes) to determine if the app is already built with janeway installed
+# if the app is not built with janeway installed, we skip plugin etc installation until janeway is installed
+app_built_enabled() {
+    case "${APP_BUILT:-false}" in
+        1|true|TRUE|yes|YES)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 # Allow running other commands (e.g., bash for debugging)
-if [ "${1:0:1}" = '-' ] || [ -z "${1##*:*}" ]; then
-    # First arg is a flag or contains ':' (app:callable), run gunicorn
+if [ $# -eq 0 ] || [ "${1:0:1}" = '-' ] || [ "$1" = 'gunicorn' ] || [ -z "${1##*:*}" ]; then
+    if ! app_built_enabled; then
+        exec "$@"
+    fi
+
+    if [ "$1" = 'gunicorn' ]; then
+        shift
+    fi
 
     # Build bind address from GUNICORN_HOST and GUNICORN_PORT, or use GUNICORN_BIND
     PORT="${GUNICORN_PORT:-8000}"
     BIND="${GUNICORN_BIND:-${GUNICORN_HOST:-0.0.0.0}:${PORT}}"
+
+    if [ $# -eq 0 ]; then
+        set -- core.wsgi:application --chdir /janeway/src
+    fi
 
     # Add bind if not specified in args or GUNICORN_ARGS
     if [[ ! " $* $GUNICORN_ARGS " =~ " --bind " ]] && [[ ! " $* $GUNICORN_ARGS " =~ " -b " ]] && [[ ! "$* $GUNICORN_ARGS" =~ --bind= ]] && [[ ! "$* $GUNICORN_ARGS" =~ -b= ]]; then
@@ -20,16 +62,13 @@ if [ "${1:0:1}" = '-' ] || [ -z "${1##*:*}" ]; then
         set -- --workers "$WORKERS" "$@"
     fi
 
-    # Append GUNICORN_ARGS if set
-    if [ -n "$GUNICORN_ARGS" ]; then
-        exec gunicorn $GUNICORN_ARGS "$@"
-    fi
-
     echo "Preparing Janeway assets..."
+    ensure_customstyling
     python /janeway/src/manage.py build_assets
-    python /janeway/src/manage.py install_plugins ksulcolors
+    install_plugins
     python /janeway/src/manage.py collectstatic --noinput
-    exec gunicorn "$@"
+    python /janeway/src/manage.py migrate --noinput
+    exec gunicorn $GUNICORN_ARGS "$@"
 fi
 
 # Otherwise, run the command as-is (e.g., bash, sh, python)
