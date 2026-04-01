@@ -3,21 +3,32 @@ set -e
 
 install_plugins() {
     local plugin
-    for plugin in ${JANEWAY_PLUGINS:-ksulcolors customstyling}; do
+    for plugin in ${JANEWAY_PLUGINS:-customstyling imports}; do
         python /janeway/src/manage.py install_plugins "$plugin"
     done
 }
 
-ensure_customstyling() {
-    local plugin_dir="/janeway/src/plugins/customstyling"
+ensure_plugins() {
+    local customstyling_dir="/janeway/src/plugins/customstyling"
+    local imports_plugin_dir="/janeway/src/plugins/imports"
 
-    if [ -d "$plugin_dir" ]; then
+    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ]; then
         return
     fi
 
-    git clone "${CUSTOMSTYLING_REPO:-https://github.com/openlibhums/customstyling.git}" \
-        --branch "${CUSTOMSTYLING_REF:-v1.1.1}" \
-        "$plugin_dir"
+    if [ ! -d "$customstyling_dir" ]; then
+        git clone "${CUSTOMSTYLING_REPO:-https://github.com/openlibhums/customstyling.git}" \
+            --branch "${CUSTOMSTYLING_REF:-v1.1.1}" \
+            "$customstyling_dir"
+    fi
+    
+    if [ ! -d "$imports_plugin_dir" ]; then
+        git clone "${IMPORTS_REPO:-https://github.com/openlibhums/imports.git}" \
+            --branch "${IMPORTS_REF:-main}" \
+            "$imports_plugin_dir"
+        # Install the required pip dependency too
+        pip install python-wordpress-xmlrpc==2.3
+    fi
 }
 
 # Check if APP_BUILT is set to a truthy value (e.g., 1, true, yes) to determine if the app is already built with janeway installed
@@ -63,7 +74,7 @@ if [ $# -eq 0 ] || [ "${1:0:1}" = '-' ] || [ "$1" = 'gunicorn' ] || [ -z "${1##*
     fi
 
     echo "Preparing Janeway assets..."
-    ensure_customstyling
+    ensure_plugins
     python /janeway/src/manage.py build_assets
     install_plugins
     python /janeway/src/manage.py collectstatic --noinput
