@@ -16,8 +16,8 @@ services:
   janeway-tallgrass-web:
     image: kstatelibraries/janeway:test
     build:
-      context: ../janeway
-      dockerfile: ../janeway/dockerfiles/Dockerfile.ksul
+      context: .
+      dockerfile: dockerfiles/Dockerfile.ksul
     restart: unless-stopped
     volumes:
       - ./tallgrass/data/logs:/logs
