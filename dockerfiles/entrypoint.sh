@@ -27,8 +27,8 @@ ensure_plugins() {
             --branch "${IMPORTS_REF:-main}" \
             "$imports_plugin_dir"
         # Install the required pip dependency too
-        pip install python-wordpress-xmlrpc==2.3
     fi
+    pip install python-wordpress-xmlrpc==2.3
 }
 
 # Check if APP_BUILT is set to a truthy value (e.g., 1, true, yes) to determine if the app is already built with janeway installed
