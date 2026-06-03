@@ -149,3 +149,6 @@ src/utils/management/commands/test_command.py
 /src/static/admin/hypothesis/**
 jenkins/test-results
 jenkins/test_results
+
+# App Data
+/tallgrass/
