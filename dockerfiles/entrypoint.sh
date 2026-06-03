@@ -3,7 +3,7 @@ set -e
 
 install_plugins() {
     local plugin
-    for plugin in ${JANEWAY_PLUGINS:-customstyling imports}; do
+    for plugin in ${JANEWAY_PLUGINS:-customstyling imports typesetting}; do
         python /janeway/src/manage.py install_plugins "$plugin"
     done
 }
@@ -11,8 +11,9 @@ install_plugins() {
 ensure_plugins() {
     local customstyling_dir="/janeway/src/plugins/customstyling"
     local imports_plugin_dir="/janeway/src/plugins/imports"
+    local bepress_dir="/janeway/src/plugins/typesetting"
 
-    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ]; then
+    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ] && [ -d "$bepress_dir" ]; then
         return
     fi
 
@@ -28,6 +29,14 @@ ensure_plugins() {
             "$imports_plugin_dir"
         # Install the required pip dependency too
     fi
+
+    if [ ! -d "$bepress_dir" ]; then
+        git clone "${BEPRESS_REPO:-https://github.com/openlibhums/bepress.git}" \
+            --branch "${BEPRESS_REF:-master}" \
+            "$bepress_dir"
+    fi
+
+
     pip install python-wordpress-xmlrpc==2.3
 }
 
