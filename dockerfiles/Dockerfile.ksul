@@ -40,7 +40,7 @@ COPY --from=build /install /usr/local
 COPY  --chown=gunicorn:gunicorn . /janeway
 
 # Copy entrypoint script
-COPY dockerfiles/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=gunicorn:gunicorn dockerfiles/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 

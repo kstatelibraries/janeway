@@ -3,7 +3,7 @@ set -e
 
 install_plugins() {
     local plugin
-    for plugin in ${JANEWAY_PLUGINS:-customstyling imports typesetting}; do
+    for plugin in ${JANEWAY_PLUGINS:-customstyling imports books bepress}; do
         python /janeway/src/manage.py install_plugins "$plugin"
     done
 }
@@ -11,9 +11,10 @@ install_plugins() {
 ensure_plugins() {
     local customstyling_dir="/janeway/src/plugins/customstyling"
     local imports_plugin_dir="/janeway/src/plugins/imports"
-    local bepress_dir="/janeway/src/plugins/typesetting"
+    local books_dir="/janeway/src/plugins/books"
+    local bepress_dir="/janeway/src/plugins/bepress"
 
-    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ] && [ -d "$bepress_dir" ]; then
+    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ] && [ -d "$books_dir" ] && [ -d "$bepress_dir" ]; then
         return
     fi
 
@@ -28,6 +29,12 @@ ensure_plugins() {
             --branch "${IMPORTS_REF:-main}" \
             "$imports_plugin_dir"
         # Install the required pip dependency too
+    fi
+
+    if [ ! -d "$books_dir" ]; then
+        git clone "${BOOKS_REPO:-https://github.com/openlibhums/books.git}" \
+            --branch "${BOOKS_REF:-master}" \
+            "$books_dir"
     fi
 
     if [ ! -d "$bepress_dir" ]; then
