@@ -454,7 +454,7 @@ EMAIL_HOST = os.environ.get("JANEWAY_EMAIL_HOST", "")
 EMAIL_PORT = os.environ.get("JANEWAY_EMAIL_PORT", "")
 EMAIL_HOST_USER = os.environ.get("JANEWAY_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("JANEWAY_EMAIL_HOST_PASSWORD", "")
-EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", True)
+EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", "True") == "True"
 DUMMY_EMAIL_DOMAIN = "@journal.com"
 
 # Settings for use with Mailgun
