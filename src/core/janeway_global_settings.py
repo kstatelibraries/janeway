@@ -454,14 +454,14 @@ EMAIL_HOST = os.environ.get("JANEWAY_EMAIL_HOST", "")
 EMAIL_PORT = os.environ.get("JANEWAY_EMAIL_PORT", "")
 EMAIL_HOST_USER = os.environ.get("JANEWAY_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("JANEWAY_EMAIL_HOST_PASSWORD", "")
-EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", True)
+EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", "False") == "True"
 DUMMY_EMAIL_DOMAIN = "@journal.com"
 
 # Settings for use with Mailgun
-MAILGUN_ACCESS_KEY = ""
+MAILGUN_ACCESS_KEY = os.environ.get("JANEWAY_MAILGUN_ACCESS_KEY", "")
 MAILGUN_SERVER_NAME = ""
 MAILGUN_REQUIRE_TLS = False
-ENABLE_ENHANCED_MAILGUN_FEATURES = False  # Enables email tracking
+ENABLE_ENHANCED_MAILGUN_FEATURES = True  # Enables email tracking
 
 
 DATE_FORMT = "Y-m-d"

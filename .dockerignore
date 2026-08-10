@@ -1,6 +1,7 @@
 db
 logs/*
 *.tar.gz
+.venv
 src/files/articles
 src/files/journals
 src/files/issues
@@ -8,3 +9,4 @@ src/files/press
 src/files/temp
 src/files/xsl
 
+tallgrass/

@@ -1,0 +1,18 @@
+:80 {
+    respond /health 200
+    root * /srv/janeway-tallgrass
+    file_server
+
+    @notStatic {
+        not path /static/*
+        not path /media/*
+        not path /files/*
+    }
+
+    reverse_proxy @notStatic janeway-tallgrass-web:8000 {
+        header_up Host {host}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+
