@@ -3,7 +3,7 @@ set -e
 
 install_plugins() {
     local plugin
-    for plugin in ${JANEWAY_PLUGINS:-customstyling imports books bepress}; do
+    for plugin in ${JANEWAY_PLUGINS:-customstyling imports books bepress reporting}; do
         python /janeway/src/manage.py install_plugins "$plugin"
     done
 }
@@ -13,8 +13,9 @@ ensure_plugins() {
     local imports_plugin_dir="/janeway/src/plugins/imports"
     local books_dir="/janeway/src/plugins/books"
     local bepress_dir="/janeway/src/plugins/bepress"
+    local reporting_dir="/janeway/src/plugins/reporting"
 
-    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ] && [ -d "$books_dir" ] && [ -d "$bepress_dir" ]; then
+    if [ -d "$customstyling_dir" ] && [ -d "$imports_plugin_dir" ] && [ -d "$books_dir" ] && [ -d "$bepress_dir" ] && [ -d "$reporting_dir" ]; then
         return
     fi
 
@@ -41,6 +42,14 @@ ensure_plugins() {
         git clone "${BEPRESS_REPO:-https://github.com/openlibhums/bepress.git}" \
             --branch "${BEPRESS_REF:-master}" \
             "$bepress_dir"
+    fi
+
+    if [ ! -d "$reporting_dir" ]; then
+        # Pinned: reporting master (v1.4) requires Janeway >= 1.9, which is
+        # unreleased. v1.3-RC-2 requires 1.5.1 and works on this 1.8.0 install.
+        git clone "${REPORTING_REPO:-https://github.com/openlibhums/reporting.git}" \
+            --branch "${REPORTING_REF:-v1.3-RC-2}" \
+            "$reporting_dir"
     fi
 
 
